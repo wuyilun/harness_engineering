@@ -1,0 +1,77 @@
+---
+description: 架构边界约束，强制前后端分离、层级调用规则和接口契约一致性。确保各 Agent 只在授权范围内操作。
+alwaysApply: true
+enabled: true
+---
+
+# 架构边界约束
+
+## 目录边界
+
+### 前端目录（`src/frontend/`）
+- 只有 `frontend-developer` 和 `frontend-tester` 可以修改
+- `frontend-tester` 只能修改 `src/frontend/tests/` 子目录
+- 其他 Agent 只能读取，不能写入
+
+### 后端目录（`src/backend/`）
+- 只有 `backend-developer` 和 `backend-tester` 可以修改
+- `backend-tester` 只能修改 `src/backend/tests/` 子目录
+- 其他 Agent 只能读取，不能写入
+
+### 项目文档目录（`project/`）
+- `project/requirements/`：只有 `requirement-expert` 可以写入
+- `project/tech_design/`：只有 `tech-architect` 可以写入
+- `project/api_specs/`：只有 `tech-architect` 可以写入
+- `project/test_reports/`：只有 `frontend-tester` 和 `backend-tester` 可以写入
+- `project/acceptance_reports/`：只有 `acceptance-expert` 可以写入
+- `project/progress.json`：只有 `pm-orchestrator` 可以写入
+
+## 前后端接口契约
+
+### 唯一真相来源
+- `project/api_specs/{task_id}_api.yaml` 是前后端接口的**唯一真相来源**
+- 前端和后端开发专家必须严格遵循此契约
+- 任何接口变更必须先修改契约文件，再同步实现
+
+### 契约一致性检查
+- 前端请求格式必须与契约中的 Request Schema 一致
+- 后端响应格式必须与契约中的 Response Schema 一致
+- 字段名、类型、嵌套结构不得单方面修改
+- 新增字段必须先在契约中定义
+
+## 后端分层架构
+
+```
+API 路由层 (api/)
+    ↓ 只能调用
+业务逻辑层 (services/)
+    ↓ 只能调用
+数据访问层 (repositories/)
+    ↓ 只能调用
+数据模型层 (models/)
+```
+
+### 硬约束
+- 禁止 API 路由直接调用 Repository
+- 禁止 Service 直接操作数据库连接
+- 禁止跨层直接访问（必须逐层调用）
+- 禁止在 API 路由层编写业务逻辑
+
+## 前端组件架构
+
+```
+Pages/
+    ↓ 组合
+Components/
+    ↓ 使用
+Hooks/Composables/
+    ↓ 调用
+API Client/
+    ↓ 请求
+Backend API
+```
+
+### 硬约束
+- 禁止在组件中直接调用 fetch/axios（必须通过 API Client）
+- 禁止在页面组件中编写可复用逻辑（提取到 Hooks/Composables）
+- 禁止组件之间的紧耦合（通过 Props/Events 通信）

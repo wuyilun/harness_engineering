@@ -1,0 +1,129 @@
+---
+description: 编码规范，涵盖 Python 后端和 React/Vue 前端的命名、注释、错误处理等规范。
+alwaysApply: false
+enabled: true
+---
+
+# 编码规范
+
+## 通用规范
+
+### 命名
+- 变量和函数：snake_case（Python）、camelCase（JavaScript/TypeScript）
+- 类和组件：PascalCase
+- 常量：UPPER_SNAKE_CASE（Python）、UPPER_CASE（TypeScript）
+- 文件名：snake_case（Python）、kebab-case 或 PascalCase（组件文件）
+- 数据库表名：snake_case，复数形式
+- API 路径：kebab-case，复数形式（如 `/api/v1/user-profiles`）
+
+### 注释
+- 公共函数/方法必须有 docstring/JSDoc
+- 注释说明"为什么"，而不是"做什么"
+- 避免无意义的注释（如 `# increment counter`）
+- TODO 注释格式：`# TODO(作者): 描述` 或 `// TODO: 描述`
+
+### 错误处理
+- 所有异常必须被捕获和处理
+- 不允许空的 except/catch 块
+- 错误信息必须对用户友好，不暴露内部细节
+- 错误日志必须包含上下文信息
+- 使用自定义异常类型，不使用通用 Exception
+
+### Git 提交
+- 提交信息格式：`type(scope): description`
+- type: feat/fix/refactor/test/docs/chore
+- 每次提交只做一件事
+
+## Python 后端规范
+
+### 代码风格
+- 遵循 PEP 8
+- 使用 Type Hints（Python 3.10+ 语法）
+- 行宽限制 120 字符
+- 使用 f-string，不使用 % 或 .format()
+
+### FastAPI 规范
+- 每个 API 端点必须有 docstring，说明功能、参数、返回值
+- 使用 Pydantic v2 定义请求/响应 Schema
+- 使用依赖注入管理数据库会话和认证
+- 路由按实体分组，使用 APIRouter
+
+### 数据库规范
+- 所有模型必须有 `id`、`created_at`、`updated_at` 字段
+- 使用 Alembic 管理数据库迁移
+- 不允许在代码中直接执行 DDL
+- 外键必须有 ondelete 策略
+
+### 示例
+
+```python
+# ✅ 好的写法
+async def get_user_by_id(user_id: int, db: AsyncSession) -> User | None:
+    """根据 ID 获取用户。
+
+    Args:
+        user_id: 用户 ID
+        db: 数据库会话
+
+    Returns:
+        用户对象，未找到时返回 None
+    """
+    result = await db.execute(select(User).where(User.id == user_id))
+    return result.scalar_one_or_none()
+
+# ❌ 不好的写法
+def get_user(id, db):
+    return db.query(User).filter(User.id == id).first()
+```
+
+## 前端规范（React/Vue）
+
+### 代码风格
+- 使用 TypeScript（禁止 any）
+- 使用 ESLint + Prettier
+- 组件文件结构：imports → types → component → styles → exports
+
+### React 规范
+- 函数组件优先，禁止 class 组件
+- 使用自定义 Hook 提取可复用逻辑
+- Props 必须定义 TypeScript 接口
+- 状态管理：简单用 useState/useReducer，复杂用 Zustand/Pinia
+- 副作用必须使用 useEffect，清理函数必须完整
+
+### Vue 规范
+- 使用 Composition API + `<script setup>`
+- 使用 TypeScript
+- Props 必须定义类型
+- 使用 Pinia 管理全局状态
+- 使用 composables 提取可复用逻辑
+
+### 样式规范
+- 使用 CSS Variables 定义设计 token
+- 使用 CSS Modules 或 Tailwind CSS
+- 不允许内联样式（动态样式除外）
+- 响应式：移动优先，使用 container queries
+
+### 示例
+
+```tsx
+// ✅ 好的写法
+interface UserCardProps {
+  user: User;
+  onEdit: (id: number) => void;
+}
+
+export function UserCard({ user, onEdit }: UserCardProps) {
+  return (
+    <article className={styles.card}>
+      <h3>{user.name}</h3>
+      <p>{user.email}</p>
+      <button onClick={() => onEdit(user.id)}>Edit</button>
+    </article>
+  );
+}
+
+// ❌ 不好的写法
+const UserCard = (props: any) => {
+  return <div><span>{props.user.name}</span></div>
+}
+```

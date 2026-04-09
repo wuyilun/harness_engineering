@@ -1,0 +1,130 @@
+---
+description: 测试规范，定义前端和后端的测试分层策略、覆盖率要求、命名规范和测试文件组织方式。
+alwaysApply: false
+enabled: true
+---
+
+# 测试规范
+
+## 通用原则
+
+### 测试金字塔
+```
+      /  E2E  \          少量，验证核心流程
+     / 集成测试  \        适量，验证模块协作
+    /   单元测试    \     大量，验证业务逻辑
+```
+
+### 覆盖率要求
+- **单元测试覆盖率**：≥ 80%
+- **API 端点测试覆盖率**：100%（每个端点至少一个正常 + 一个异常用例）
+- **核心业务逻辑覆盖率**：≥ 90%
+
+### 命名规范
+- 测试文件：`test_{module_name}.py`（后端）、`{ComponentName}.test.tsx`（前端）
+- 测试函数：`test_{功能}_{场景}_{预期结果}`
+- 测试描述：使用自然语言描述测试意图
+
+### AAA 模式
+每个测试用例遵循 Arrange-Act-Assert 模式：
+1. **Arrange**：准备测试数据和环境
+2. **Act**：执行被测试的操作
+3. **Assert**：验证结果符合预期
+
+## 后端测试规范（Python + pytest）
+
+### 文件组织
+```
+src/backend/tests/
+├── conftest.py           # 全局 fixture
+├── unit/                 # 单元测试
+│   ├── test_services/
+│   ├── test_repositories/
+│   └── test_utils/
+├── integration/          # 集成测试
+│   └── test_{feature}/
+└── api/                  # API 测试
+    └── test_{entity}_api.py
+```
+
+### 必须测试的场景
+每个 API 端点：
+1. 正常请求 → 正确状态码 + 正确数据
+2. 缺少必填参数 → 422
+3. 参数类型错误 → 422
+4. 参数范围越界 → 422
+5. 未认证 → 401
+6. 无权限 → 403
+7. 资源不存在 → 404
+
+### Fixture 规范
+- 使用 conftest.py 管理共享 fixture
+- 数据库测试使用事务回滚（不污染数据库）
+- 外部服务使用 Mock
+
+### 示例
+```python
+async def test_create_user_with_valid_data_returns_201(client, db_session):
+    # Arrange
+    user_data = {"username": "testuser", "email": "test@example.com", "password": "SecurePass123!"}
+
+    # Act
+    response = await client.post("/api/v1/users", json=user_data)
+
+    # Assert
+    assert response.status_code == 201
+    assert response.json()["username"] == "testuser"
+    assert "password" not in response.json()
+```
+
+## 前端测试规范
+
+### 文件组织
+```
+src/frontend/tests/
+├── unit/                 # 组件单元测试
+│   └── {ComponentName}.test.tsx
+├── integration/          # 集成测试
+│   └── {FeatureName}.test.tsx
+└── e2e/                  # E2E 测试
+    └── {FlowName}.spec.ts
+```
+
+### 必须测试的场景
+每个组件：
+1. 正常渲染（有数据）
+2. 空状态
+3. 加载状态
+4. 错误状态
+5. 用户交互（点击、输入、提交）
+6. 无障碍访问（键盘导航、ARIA 属性）
+
+### Mock 规范
+- API 调用必须 Mock（使用 MSW 或 jest.mock）
+- 不 Mock 内部模块（只 Mock 外部依赖）
+- Mock 数据必须符合 API 契约
+
+### 示例
+```tsx
+describe("UserList", () => {
+  it("displays empty state when no users exist", async () => {
+    // Arrange
+    mockApi.getUsers.mockResolvedValue([]);
+
+    // Act
+    render(<UserList />);
+
+    // Assert
+    expect(await screen.findByText(/no users found/i)).toBeInTheDocument();
+  });
+});
+```
+
+## 测试报告规范
+
+测试报告必须包含：
+1. 测试概要（总数/通过/失败/跳过/覆盖率）
+2. 失败用例详情（文件、描述、预期 vs 实际、严重程度）
+3. 未覆盖场景列表
+4. 契约一致性检查结果（后端）
+5. 无障碍检查结果（前端）

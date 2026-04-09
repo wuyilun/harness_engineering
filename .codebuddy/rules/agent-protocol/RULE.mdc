@@ -1,0 +1,108 @@
+---
+description: Agent 间通信协议，定义任务流转规则、结构化接口格式和错误处理机制。PM 专家在派发任务时必须遵循此协议。
+alwaysApply: false
+enabled: true
+---
+
+# Agent 通信协议
+
+## 任务流转规则
+
+### 正向流转
+```
+用户需求 → PM → 需求专家 → PM → 技术方案专家 → PM → {前端开发, 后端开发} → PM → {前端测试, 后端测试} → PM → 验收专家 → PM → 交付
+```
+
+### 核心规则
+1. **上游产出未完成，下游不启动**
+2. **Agent 之间不直接通信**，所有流转通过 PM 中转
+3. **测试专家发现问题报回 PM**，不直接修改代码
+4. **验收不通过报回 PM**，由 PM 决定回退环节
+5. **同一问题最多迭代 3 轮**
+
+## 任务派发格式
+
+PM 派发任务时，必须包含以下结构化信息：
+
+```json
+{
+  "task_id": "T001",
+  "assigned_to": "agent-name",
+  "phase": "requirement|tech-design|dev|test|acceptance",
+  "input": {
+    "user_request": "原始需求或上下文描述",
+    "upstream_artifacts": ["上游产出文件路径列表"]
+  },
+  "expected_output": "产出文件路径模式",
+  "quality_gate": "质量门描述"
+}
+```
+
+## 任务完成回报格式
+
+Agent 完成任务后，必须返回以下结构化信息：
+
+```json
+{
+  "task_id": "T001",
+  "status": "completed|failed|blocked",
+  "output_files": ["产出文件路径列表"],
+  "quality_check": {
+    "passed": true,
+    "issues": []
+  },
+  "error_message": "失败或阻塞时的描述（如有）"
+}
+```
+
+## 错误处理协议
+
+### Agent 遇到错误时
+1. 标记任务状态为 `failed` 或 `blocked`
+2. 在 `error_message` 中描述具体原因
+3. 如有可能，提供修复建议
+4. 不要自行尝试修复超出职责范围的问题
+
+### PM 处理错误时
+1. 分析错误归属（哪个 Agent 的职责范围）
+2. 决定回退到哪个环节
+3. 派发修复任务
+4. 跟踪修复结果
+
+## 进度跟踪
+
+`project/progress.json` 的结构：
+
+```json
+{
+  "project_name": "项目名",
+  "created_at": "ISO 8601",
+  "current_phase": "idle|requirement|tech-design|dev|test|acceptance|done",
+  "tasks": [
+    {
+      "task_id": "T001",
+      "phase": "dev",
+      "assigned_to": "frontend-developer",
+      "status": "in_progress",
+      "started_at": "ISO 8601",
+      "upstream_artifacts": ["project/tech_design/T001_design.md"]
+    }
+  ],
+  "completed_tasks": [
+    {
+      "task_id": "T001",
+      "phase": "requirement",
+      "assigned_to": "requirement-expert",
+      "status": "completed",
+      "output_files": ["project/requirements/T001_requirement.md"]
+    }
+  ],
+  "global_decisions": [
+    {
+      "decision": "选择 React 作为前端框架",
+      "reason": "项目复杂度较高，React 生态更成熟",
+      "made_at": "ISO 8601"
+    }
+  ]
+}
+```

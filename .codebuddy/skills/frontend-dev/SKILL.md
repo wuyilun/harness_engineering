@@ -47,7 +47,7 @@ description: "Use this skill when implementing frontend code. Integrates the Imp
    - 状态管理配置
    - 设计 token 和 CSS Variables
 
-3. **组件开发**
+2. **组件开发**
    - 先结构（HTML/语义化），后样式（CSS），再逻辑（JS/TS）
    - 每个组件覆盖：默认/加载/空/错误状态
    - 所有交互状态：hover/focus/active/disabled

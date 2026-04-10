@@ -63,6 +63,20 @@ enabledAutoRun: true
 
 ## 工作流程
 
+### 0. 项目初始化（新项目）
+
+如果 `src/frontend/package.json` 不存在，执行初始化：
+
+```bash
+# React 项目（默认）
+bash .codebuddy/skills/frontend-dev/scripts/init_project.sh react src/frontend
+
+# Vue 项目
+bash .codebuddy/skills/frontend-dev/scripts/init_project.sh vue src/frontend
+```
+
+框架选择由技术方案专家决定。如果技术方案未指定，默认使用 React。
+
 ### 1. 读取上游产出
 
 并行读取：

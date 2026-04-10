@@ -30,24 +30,39 @@ description: "Use this skill when implementing Python backend code. Covers the c
 
 运行 [初始化脚本](scripts/init_project.py) 创建项目骨架：
 
+```bash
+python3 .codebuddy/skills/backend-dev/scripts/init_project.py src/backend
+```
+
+脚本会自动创建完整的 FastAPI 项目骨架，包括：
+
 ```
 src/backend/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py
-│   ├── config.py
-│   ├── database.py
-│   ├── models/
-│   ├── schemas/
+│   ├── main.py          # FastAPI 应用入口（含 CORS、健康检查）
+│   ├── config.py         # Pydantic Settings 配置管理
+│   ├── database.py       # 异步数据库连接 + Session 管理
+│   ├── models/           # SQLAlchemy 数据模型
+│   ├── schemas/          # Pydantic 请求/响应 schema
 │   ├── api/
+│   │   ├── router.py     # 主路由注册
 │   │   └── v1/
-│   ├── services/
-│   ├── repositories/
+│   ├── services/         # 业务逻辑层
+│   ├── repositories/     # 数据访问层
 │   └── middleware/
 ├── alembic/
+│   ├── env.py            # 异步迁移环境
+│   └── versions/
 ├── alembic.ini
-├── requirements.txt
+├── requirements.txt      # 依赖清单（含版本号）
+├── .env.example          # 环境变量模板
+├── .env                  # 本地开发环境变量
 └── tests/
+    ├── conftest.py       # 测试配置（异步 client + 数据库 fixture）
+    ├── unit/
+    ├── integration/
+    └── api/
 ```
 
 ### 步骤 3：实现功能

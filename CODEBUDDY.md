@@ -63,6 +63,19 @@
 用户需求 → PM 拆解 → 需求专家 → 技术方案专家 → 前端+后端并行开发 → 前端+后端并行测试 → 功能验收 → 交付/打回
 ```
 
+## 项目自动初始化
+
+前端/后端开发专家在首次收到开发任务时，自动检测项目是否已初始化：
+
+- **前端**：检测 `src/frontend/package.json`，不存在则执行 `bash .codebuddy/skills/frontend-dev/scripts/init_project.sh [react|vue] src/frontend`
+- **后端**：检测 `src/backend/app/main.py`，不存在则执行 `python3 .codebuddy/skills/backend-dev/scripts/init_project.py src/backend`
+
+也可手动初始化（克隆模板后）：
+```bash
+bash .codebuddy/skills/frontend-dev/scripts/init_project.sh react src/frontend
+python3 .codebuddy/skills/backend-dev/scripts/init_project.py src/backend
+```
+
 ## 前端设计质量保证
 
 前端开发专家集成 Impeccable 设计技能体系（21 个 skill），确保：

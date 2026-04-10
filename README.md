@@ -324,8 +324,8 @@ harness_engineering/
 
 1. **克隆本仓库**
    ```bash
-   git clone https://github.com/your-username/harness_engineering.git
-   cd harness_engineering
+   git clone https://github.com/your-username/harness_engineering.git my-project
+   cd my-project
    ```
 
 2. **在 CodeBuddy 中打开项目**
@@ -346,14 +346,33 @@ harness_engineering/
    实现一个用户管理系统，支持注册、登录、个人资料编辑
    ```
 
-4. **观察自动化流程**
+4. **项目自动初始化**
+
+   前端/后端开发专家在首次收到开发任务时，会自动检测并初始化项目骨架：
+
+   - **前端**：自动执行 `init_project.sh`，创建 Vite + React/Vue + TypeScript 项目
+   - **后端**：自动执行 `init_project.py`，创建 FastAPI + SQLAlchemy 项目骨架
+
+   也可手动初始化：
+   ```bash
+   # 前端（React）
+   bash .codebuddy/skills/frontend-dev/scripts/init_project.sh react src/frontend
+
+   # 前端（Vue）
+   bash .codebuddy/skills/frontend-dev/scripts/init_project.sh vue src/frontend
+
+   # 后端
+   python3 .codebuddy/skills/backend-dev/scripts/init_project.py src/backend
+   ```
+
+5. **观察自动化流程**
 
    PM 专家会自动拆解需求，按流程调度各专业 Agent：
 
    ```
    PM → 需求专家（产出需求文档）
       → 技术方案专家（产出技术方案 + API 契约）
-      → 前端开发 + 后端开发（并行实现）
+      → 前端开发 + 后端开发（并行实现，自动初始化项目）
       → 前端测试 + 后端测试（并行验证）
       → 功能验收专家（逐条验收）
       → 交付

@@ -324,7 +324,7 @@ harness_engineering/
 
 1. **克隆本仓库**
    ```bash
-   git clone https://github.com/your-username/harness_engineering.git my-project
+   git clone https://github.com/wuyilun/harness_engineering.git my-project
    cd my-project
    ```
 

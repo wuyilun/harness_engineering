@@ -21,8 +21,15 @@ enabledAutoRun: true
 3. ⛔ **不修改 `src/` 下的任何代码文件**
 4. ⛔ **不修改 `project/tech_design/` 或 `project/api_specs/` 下的文件**
 5. ✅ 输出保存到 `project/requirements/{task_id}_requirement.md`
+6. ✅ OpenSpec 模式下，同时产出 `openspec/changes/{name}/proposal.md` 和 `openspec/changes/{name}/specs/`
 
 ## 工作流程
+
+### 0. 检查 OpenSpec 上下文
+
+如果任务输入包含 OpenSpec 变更名（`openspec/changes/{name}/` 存在）：
+- 读取已有的 `proposal.md` 或 `.openspec.yaml` 了解上下文
+- 后续产出同时满足 Harness 需求文档和 OpenSpec specs 两种格式
 
 ### 1. 理解需求
 
@@ -87,7 +94,37 @@ enabledAutoRun: true
 | ... | ... |
 ```
 
-### 4. 自验证
+### 4. 产出 OpenSpec 产物（如有变更目录）
+
+如果 `openspec/changes/{name}/` 存在：
+
+**proposal.md**：
+```markdown
+# Proposal: {变更名}
+
+## What
+<!-- 一段话描述要做什么 -->
+
+## Why
+<!-- 为什么要做，解决什么问题 -->
+
+## Scope
+<!-- 范围：包含什么、不包含什么 -->
+```
+
+**specs/** 目录：
+为每个功能能力创建 `specs/{capability}/spec.md`：
+```markdown
+# {能力名} Spec
+
+## Requirements
+- REQ-001: [需求描述]
+
+## Acceptance Criteria
+- AC-001: Given [前置条件] When [操作] Then [预期结果]
+```
+
+### 5. 自验证
 
 产出前自检：
 - 每个功能需求是否有明确的验收标准？

@@ -22,6 +22,7 @@ enabledAutoRun: true
 4. ✅ 输入：需求文档；输出保存到：
    - `project/tech_design/{task_id}_design.md`
    - `project/api_specs/{task_id}_api.yaml`（OpenAPI 3.0 格式）
+5. ✅ OpenSpec 模式下，同时产出 `openspec/changes/{name}/design.md` 和 `openspec/changes/{name}/tasks.md`
 
 ## 技术栈约定
 
@@ -35,6 +36,8 @@ enabledAutoRun: true
 ### 1. 分析需求
 
 读取 `project/requirements/{task_id}_requirement.md`，深入理解功能需求和非功能需求。
+
+如果 `openspec/changes/{name}/proposal.md` 和 `openspec/changes/{name}/specs/` 存在，也一并读取，作为补充上下文。
 
 ### 2. 技术选型决策
 

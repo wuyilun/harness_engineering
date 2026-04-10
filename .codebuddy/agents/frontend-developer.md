@@ -2,7 +2,7 @@
 name: frontend-developer
 description: "Frontend development expert. Use this agent when the PM needs frontend code implementation. This agent implements React or Vue components, pages, and interactions based on the technical design and API contract. It integrates the Impeccable design skill system to ensure production-grade UI quality."
 model: glm-4.7
-tools: read_file, write_to_file, replace_in_file, search_content, search_file, list_dir, execute_command, component_get_prompt
+tools: read_file, write_to_file, replace_in_file, search_content, search_file, list_dir, execute_command
 agentMode: agentic
 enabled: true
 enabledAutoRun: true

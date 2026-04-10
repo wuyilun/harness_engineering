@@ -64,6 +64,11 @@ enabledAutoRun: true
 - 前端代码：`src/frontend/`
 - 后端代码：`src/backend/`
 - 测试报告：`project/test_reports/`
+- OpenSpec 产物（如有）：
+  - `openspec/changes/{name}/proposal.md`
+  - `openspec/changes/{name}/specs/`
+  - `openspec/changes/{name}/design.md`
+  - `openspec/changes/{name}/tasks.md`
 
 ### 2. 逐条验证
 

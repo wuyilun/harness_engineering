@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Impeccable design context
+.impeccable.md
+
+# Test coverage
+coverage/
+htmlcov/
+.coverage
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log

@@ -22,20 +22,72 @@ enabled: true
 
 ## 任务派发格式
 
-PM 派发任务时，必须包含以下结构化信息：
+PM 派发任务时，必须包含**浓缩上下文**，不能只传文件路径。遵循六要素：
 
-```json
-{
-  "task_id": "T001",
-  "assigned_to": "agent-name",
-  "phase": "requirement|tech-design|dev|test|acceptance",
-  "input": {
-    "user_request": "原始需求或上下文描述",
-    "upstream_artifacts": ["上游产出文件路径列表"]
-  },
-  "expected_output": "产出文件路径模式",
-  "quality_gate": "质量门描述"
-}
+1. **任务概述**：PM 精炼后的任务目标描述
+2. **关键决策**：上游已做出的决策及理由
+3. **核心上下文摘要**：PM 提取的数据模型、接口设计、业务规则等
+4. **参考文件路径**：上游产出文件
+5. **约束和注意点**：特殊约束、已知风险
+6. **交付标准**：明确的完成条件
+
+### 派发 prompt 模板
+
+```
+## 任务：{2-3句精炼描述}
+
+## 上游决策
+- {决策1}：{理由}
+- {决策2}：{理由}
+
+## 核心上下文
+- 数据模型：{核心实体和字段}
+- 接口设计：{关键 API 端点和数据格式}
+- 业务规则：{核心业务逻辑}
+- 约束条件：{必须遵守的限制}
+
+## 参考文件
+- {文件路径1}
+- {文件路径2}
+
+## 注意事项
+- {PM 识别到的风险或特殊点}
+
+## 交付标准
+- {明确的完成条件}
+- {需要产出的文件列表}
+```
+
+### ❌ 反面示例
+```
+请完成 T001 后端开发。参考：project/tech_design/T001_design.md
+```
+
+### ✅ 正面示例
+```
+## 任务：实现用户管理模块后端 API，包括注册、登录、个人资料编辑。
+
+## 上游决策
+- 数据库选 SQLite：轻量级项目
+- 认证用 JWT：需求要求多端登录
+- 密码用 bcrypt：安全规则强制
+
+## 核心上下文
+- 数据模型：User(id, email, password_hash, nickname, avatar_url, created_at)
+- 接口：POST /auth/register, POST /auth/login, GET /users/me, PUT /users/me
+- 业务规则：email唯一, 密码≥8位, JWT 24h过期
+
+## 参考文件
+- project/tech_design/T001_design.md
+- project/api_specs/T001_api.yaml
+
+## 注意事项
+- 边界条件：email校验、密码强度、重复注册409
+- 安全规则：禁止SQL拼接、禁止日志输出密码
+
+## 交付标准
+- 完整 FastAPI 代码到 src/backend/app/
+- 通过安全自检
 ```
 
 ## 任务完成回报格式
@@ -68,6 +120,51 @@ Agent 完成任务后，必须返回以下结构化信息：
 2. 决定回退到哪个环节
 3. 派发修复任务
 4. 跟踪修复结果
+
+## 断链恢复
+
+### 保存时机
+
+PM 必须在以下时刻更新 `project/session_state.json`：
+1. 每个阶段开始时（更新 current_phase）
+2. 每个阶段完成时（更新 status + output_files + context_summary）
+3. 每个迭代开始/完成时
+4. 遇到错误时（记录 pending_issues）
+
+### session_state.json 结构
+
+```json
+{
+  "version": "1.0",
+  "last_updated": "ISO 8601",
+  "current_iteration": {
+    "iteration_id": "IT-001",
+    "name": "功能模块名",
+    "status": "in_progress",
+    "current_phase": "dev",
+    "started_at": "ISO 8601"
+  },
+  "phase_states": {
+    "requirement": {
+      "status": "completed|in_progress|pending",
+      "completed_at": "ISO 8601",
+      "output_files": [],
+      "key_decisions": [],
+      "context_summary": "PM 提取的关键信息摘要"
+    }
+  },
+  "pm_understanding": "PM 当前对项目的完整理解",
+  "pending_issues": [],
+  "completed_iterations": []
+}
+```
+
+### 恢复流程
+
+1. 读取 `session_state.json`
+2. 找到最后完成的阶段
+3. 从下一个阶段继续，注入 context_summary 和 key_decisions
+4. 向用户汇报恢复状态
 
 ## 进度跟踪
 

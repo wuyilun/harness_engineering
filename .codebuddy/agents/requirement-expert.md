@@ -25,7 +25,17 @@ enabledAutoRun: true
 
 ## 工作流程
 
-### 0. 检查 OpenSpec 上下文
+### 0. 接收上下文
+
+PM 派发任务时会提供浓缩上下文，包含：
+- 任务概述（PM 理解后的需求精炼）
+- 用户原始需求
+- 约束和注意点（PM 识别到的特殊约束）
+- 如果是后续迭代：前序迭代的产出摘要
+
+**你必须先理解 PM 传递的上下文，确保需求分析与 PM 的理解一致。**
+
+### 1. 检查 OpenSpec 上下文
 
 如果任务输入包含 OpenSpec 变更名（`openspec/changes/{name}/` 存在）：
 - 读取已有的 `proposal.md` 或 `.openspec.yaml` 了解上下文

@@ -21,7 +21,7 @@ enabledAutoRun: true
 3. ⛔ **不修改 API 契约**（`project/api_specs/` 下的文件）
 4. ⛔ **不修改需求文档和技术方案文档**
 5. ✅ 严格按照 `project/api_specs/` 中的 API 契约开发
-6. ✅ 必须通过前端测试专家的验证才能标记完成
+6. ✅ 必须通过 qa-engineer 的验证才能标记完成
 
 ## 设计质量保证（Impeccable 集成）
 

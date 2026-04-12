@@ -9,51 +9,45 @@ enabled: true
 ## 目录边界
 
 ### 前端目录（`src/frontend/`）
-- 只有 `frontend-developer` 和 `frontend-tester` 可以修改
-- `frontend-tester` 只能修改 `src/frontend/tests/` 子目录
+- 只有 `frontend-developer` 和 `qa-engineer` 可以修改
+- `qa-engineer` 只能修改 `src/frontend/tests/` 子目录
 - 其他 Agent 只能读取，不能写入
 
 ### 后端目录（`src/backend/`）
-- 只有 `backend-developer` 和 `backend-tester` 可以修改
-- `backend-tester` 只能修改 `src/backend/tests/` 子目录
+- 只有 `backend-developer` 和 `qa-engineer` 可以修改
+- `qa-engineer` 只能修改 `src/backend/tests/` 子目录
 - 其他 Agent 只能读取，不能写入
 
 ### 项目文档目录（`project/`）
-- `project/requirements/`：只有 `requirement-expert` 可以写入
-- `project/tech_design/`：只有 `tech-architect` 可以写入
-- `project/api_specs/`：只有 `tech-architect` 可以写入
-- `project/test_reports/`：只有 `frontend-tester` 和 `backend-tester` 可以写入
+- `project/requirements/`：只有 `product-architect` 可以写入
+- `project/tech_design/`：只有 `product-architect` 可以写入
+- `project/api_specs/`：只有 `product-architect` 可以写入
+- `project/test_reports/`：只有 `qa-engineer` 可以写入
 - `project/acceptance_reports/`：只有 `acceptance-expert` 可以写入
 - `project/progress.json`：只有 `pm-orchestrator` 可以写入
+- `project/session_state.json`：只有 `pm-orchestrator` 可以写入
 
 ## 专家执行顺序约束
 
 ### 严格串行阶段（不可并行）
 
-以下专家必须**严格按顺序执行**，前一个专家未完成前，后续专家**不得启动**：
-
-| 顺序 | 专家 | 职责 | 前置条件 |
-|------|------|------|---------|
-| 1 | `requirement-expert` | 需求分析 | 用户需求 |
-| 2 | `tech-architect` | 技术方案设计 | 需求文档完成 |
-| 3 | `frontend-developer` | 前端开发 | 技术方案完成 |
-| 4 | `backend-developer` | 后端开发 | 技术方案完成 |
-| 5 | `frontend-tester` | 前端测试 | 前端开发完成 |
-| 6 | `backend-tester` | 后端测试 | 后端开发完成 |
-| 7 | `acceptance-expert` | 功能验收 | 前后端测试完成 |
+| 顺序 | 阶段 | 执行 Agent | 前置条件 |
+|------|------|-----------|---------|
+| 1 | 需求+方案 | `product-architect` | 用户需求 |
+| 2 | 前端开发 | `frontend-developer` | 技术方案完成 |
+| 3 | 后端开发 | `backend-developer` | 技术方案完成 |
+| 4 | 测试 | `qa-engineer` | 前后端开发完成 |
+| 5 | 功能验收 | `acceptance-expert` | 测试完成 |
 
 ### 可并行执行
-
-以下专家可以在满足前置条件后**并行执行**：
 
 | 并行组 | 专家A | 专家B | 并行条件 |
 |--------|-------|-------|---------|
 | 开发并行 | `frontend-developer` | `backend-developer` | 技术方案已完成 |
-| 测试并行 | `frontend-tester` | `backend-tester` | 各自对应的开发已完成 |
 
 ### 硬约束（绝对禁止）
 
-- ⛔ **禁止跳过阶段**：需求专家未完成，技术方案专家不得开始
+- ⛔ **禁止跳过阶段**：product-architect 未完成，开发不得开始
 - ⛔ **禁止抢做其他专家的事**：每个专家只能做自己职责范围内的事
 - ⛔ **PM 只能调度**：PM 专家（pm-orchestrator）绝不直接编写代码、绝不替代其他专家执行任务
 - ⛔ **禁止因等待而自行行动**：某专家等待上游产出时，**不得自行去做其他专家的工作**

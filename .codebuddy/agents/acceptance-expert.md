@@ -74,7 +74,7 @@ PM 派发任务时会提供浓缩上下文，包含：
 - 技术方案：`project/tech_design/{task_id}_design.md`
 - 前端代码：`src/frontend/`
 - 后端代码：`src/backend/`
-- 测试报告：`project/test_reports/`
+- 测试报告：`project/test_reports/`（由 qa-engineer 产出，统一的前后端测试报告）
 - OpenSpec 产物（如有）：
   - `openspec/changes/{name}/proposal.md`
   - `openspec/changes/{name}/specs/`

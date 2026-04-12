@@ -10,13 +10,13 @@ enabled: true
 
 ### 正向流转
 ```
-用户需求 → PM → 需求专家 → PM → 技术方案专家 → PM → {前端开发, 后端开发} → PM → {前端测试, 后端测试} → PM → 验收专家 → PM → 交付
+用户需求 → PM → product-architect → PM → {前端开发, 后端开发} → PM → qa-engineer → PM → 验收专家 → PM → 交付
 ```
 
 ### 核心规则
 1. **上游产出未完成，下游不启动**
 2. **Agent 之间不直接通信**，所有流转通过 PM 中转
-3. **测试专家发现问题报回 PM**，不直接修改代码
+3. **QA 发现问题报回 PM**，不直接修改代码
 4. **验收不通过报回 PM**，由 PM 决定回退环节
 5. **同一问题最多迭代 3 轮**
 
@@ -145,12 +145,23 @@ PM 必须在以下时刻更新 `project/session_state.json`：
     "started_at": "ISO 8601"
   },
   "phase_states": {
-    "requirement": {
+    "requirement_and_design": {
       "status": "completed|in_progress|pending",
       "completed_at": "ISO 8601",
       "output_files": [],
       "key_decisions": [],
       "context_summary": "PM 提取的关键信息摘要"
+    },
+    "dev": {
+      "status": "completed|in_progress|pending",
+      "frontend_status": "completed|in_progress|pending",
+      "backend_status": "completed|in_progress|pending"
+    },
+    "test": {
+      "status": "completed|in_progress|pending"
+    },
+    "acceptance": {
+      "status": "completed|in_progress|pending"
     }
   },
   "pm_understanding": "PM 当前对项目的完整理解",
@@ -174,7 +185,7 @@ PM 必须在以下时刻更新 `project/session_state.json`：
 {
   "project_name": "项目名",
   "created_at": "ISO 8601",
-  "current_phase": "idle|requirement|tech-design|dev|test|acceptance|done",
+  "current_phase": "idle|requirement-design|dev|test|acceptance|done",
   "tasks": [
     {
       "task_id": "T001",
@@ -188,10 +199,14 @@ PM 必须在以下时刻更新 `project/session_state.json`：
   "completed_tasks": [
     {
       "task_id": "T001",
-      "phase": "requirement",
-      "assigned_to": "requirement-expert",
+      "phase": "requirement-design",
+      "assigned_to": "product-architect",
       "status": "completed",
-      "output_files": ["project/requirements/T001_requirement.md"]
+      "output_files": [
+        "project/requirements/T001_requirement.md",
+        "project/tech_design/T001_design.md",
+        "project/api_specs/T001_api.yaml"
+      ]
     }
   ],
   "global_decisions": [

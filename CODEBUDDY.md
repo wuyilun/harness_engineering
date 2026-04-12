@@ -4,17 +4,17 @@
 
 基于 Harness Engineering 范式构建的多专家协作软件开发环境。核心公式：**Agent = Model + Harness**。
 
-系统通过硬约束（Rules）、专业能力包（Skills）、结构化通信协议、规范驱动开发（OpenSpec）和分层记忆体系，让 8 个专业 Agent 在受控边界内可靠协作。
+系统通过硬约束（Rules）、专业能力包（Skills）、结构化通信协议、规范驱动开发（OpenSpec）和分层记忆体系，让 6 个专业 Agent 在受控边界内可靠协作。
 
 ## 架构总览
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │                  第三层：验证与验收层                       │
-│  前端测试专家 ←→ 后端测试专家 ←→ 功能验收专家              │
+│  QA 测试专家 ←→ 功能验收专家                              │
 ├──────────────────────────────────────────────────────────┤
 │                  第二层：执行与开发层                       │
-│  需求专家 → 技术方案专家 → 前端开发专家 + 后端开发专家       │
+│  产品架构专家 → 前端开发专家 + 后端开发专家                 │
 ├──────────────────────────────────────────────────────────┤
 │                  第一层：调度与约束层                       │
 │  PM 专家（调度）+ Rules（硬约束）+ Skills（能力包）         │
@@ -47,12 +47,12 @@
 ### 模式一：OpenSpec 规范驱动（推荐）
 
 ```
-/opsx:propose → 需求专家(proposal+specs) → 技术方案专家(design+tasks) → /opsx:apply(开发) → 测试 → 验收 → /opsx:archive
+/opsx:propose → 产品架构专家(proposal+specs+design+tasks) → /opsx:apply(开发) → QA测试 → 验收 → /opsx:archive
 ```
 
 | OpenSpec 命令 | Harness 阶段 | 说明 |
 |--------------|-------------|------|
-| `/opsx:propose` | 需求 + 技术方案 | 产出 proposal.md + specs/ + design.md + tasks.md |
+| `/opsx:propose` | 需求 + 技术方案 | 产品架构专家一体化产出 proposal + specs + design + tasks |
 | `/opsx:apply` | 并行开发 | 按 tasks.md 逐条实现，受架构边界约束 |
 | `/opsx:explore` | 需求探索 | 纯思考探索，不写代码 |
 | `/opsx:archive` | 归档 | 验收通过后归档变更 |
@@ -60,7 +60,7 @@
 ### 模式二：传统 Harness 流程
 
 ```
-用户需求 → PM 拆解 → 需求专家 → 技术方案专家 → 前端+后端并行开发 → 前端+后端并行测试 → 功能验收 → 交付/打回
+用户需求 → PM 拆解 → 产品架构专家 → 前端+后端并行开发 → QA测试 → 功能验收 → 交付/打回
 ```
 
 ## 核心优化
@@ -120,7 +120,7 @@ python3 .codebuddy/skills/backend-dev/scripts/init_project.py src/backend
 ```
 harness_engineering/
 ├── .codebuddy/
-│   ├── agents/              # 8 个 Agent 定义
+│   ├── agents/              # 6 个 Agent 定义
 │   ├── commands/             # OpenSpec 斜杠命令
 │   ├── rules/               # 5 个硬约束规则
 │   ├── skills/              # 32 个 Skill（7 业务 + 4 OpenSpec + 21 Impeccable）
